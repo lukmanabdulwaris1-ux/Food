@@ -1,0 +1,454 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AyoFoods — Login / Register</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      overflow-x: hidden; background: #1a1a2e; color: #e0e0e0;
+    }
+    .auth-bg {
+      position: fixed; inset: 0; z-index: -1;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 70%, #1a1a2e 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 12s ease infinite;
+    }
+    .auth-bg::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 20% 50%, rgba(232,93,4,.15) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 20%, rgba(244,140,6,.1) 0%, transparent 50%);
+    }
+    @keyframes gradientShift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+    .auth-card {
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px; padding: 2.5rem 2rem;
+      width: 100%; max-width: 420px; margin: 1rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      position: relative; overflow: hidden;
+    }
+    .auth-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, #e85d04, #f48c06, #e85d04);
+      background-size: 200% 100%; animation: shimmer 3s linear infinite;
+    }
+    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+    .auth-logo { text-align: center; margin-bottom: 1.75rem; }
+    .auth-logo a {
+      font-size: 1.6rem; font-weight: 800; color: #fff;
+      text-decoration: none; display: inline-flex; align-items: center; gap: .4rem;
+    }
+    .auth-logo .accent { color: #f48c06; }
+
+    .auth-panel { display: none; animation: fadeSlide .35s ease; }
+    .auth-panel.active { display: block; }
+    @keyframes fadeSlide { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    .panel-title { font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: .35rem; }
+    .panel-subtitle { font-size: .85rem; color: #a0a0b0; margin-bottom: 1.75rem; }
+
+    .field-wrap { position: relative; margin-bottom: 1.25rem; }
+    .field-wrap input {
+      width: 100%; background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 10px;
+      padding: 1rem 2.8rem 1rem 1rem; color: #fff;
+      font-family: 'Poppins', sans-serif; font-size: .92rem;
+      transition: border-color .25s, box-shadow .25s; outline: none;
+    }
+    .field-wrap input:focus { border-color: #f48c06; box-shadow: 0 0 0 3px rgba(244,140,6,.15); }
+    .field-wrap label {
+      position: absolute; left: 1rem; top: 50%; transform: translateY(-50%);
+      color: #a0a0b0; font-size: .88rem; pointer-events: none;
+      transition: all .2s ease; background: transparent;
+    }
+    .field-wrap input:focus ~ label,
+    .field-wrap input:not(:placeholder-shown) ~ label {
+      top: 0; transform: translateY(-50%); font-size: .72rem; color: #f48c06;
+      background: #16213e; padding: 0 .3rem; border-radius: 4px;
+    }
+    .field-wrap input::placeholder { color: transparent; }
+    .toggle-pw {
+      position: absolute; right: .85rem; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: #a0a0b0; cursor: pointer;
+      font-size: .95rem; padding: .2rem; transition: color .2s;
+    }
+    .toggle-pw:hover { color: #f48c06; }
+
+    .auth-btn {
+      width: 100%; padding: .9rem;
+      background: linear-gradient(135deg, #e85d04, #f48c06);
+      color: #fff; border: none; border-radius: 10px;
+      font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: transform .2s, box-shadow .2s; margin-top: .5rem;
+    }
+    .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(232,93,4,.4); }
+    .auth-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+    .auth-link { color: #f48c06; text-decoration: none; font-weight: 600; transition: opacity .2s; cursor: pointer; }
+    .auth-link:hover { opacity: .8; }
+    .auth-switch { text-align: center; margin-top: 1.25rem; font-size: .85rem; color: #a0a0b0; }
+    .forgot-link { display: block; text-align: right; font-size: .8rem; margin-top: -.75rem; margin-bottom: 1rem; }
+
+    .otp-row { display: flex; gap: .6rem; justify-content: center; margin: 1.25rem 0; }
+    .otp-box {
+      width: 46px; height: 54px;
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 700;
+      text-align: center; font-family: 'Poppins', sans-serif; outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .otp-box:focus { border-color: #f48c06; box-shadow: 0 0 0 3px rgba(244,140,6,.2); }
+    .otp-box.filled { border-color: #f48c06; }
+
+    .resend-row { text-align: center; font-size: .82rem; color: #a0a0b0; margin-bottom: 1rem; }
+    #resendBtn { background: none; border: none; font-family: inherit; font-size: .82rem; }
+
+    .auth-msg { padding: .7rem 1rem; border-radius: 8px; font-size: .85rem; margin-bottom: 1rem; display: none; }
+    .auth-msg.error   { background: rgba(255,80,80,.12); border: 1px solid rgba(255,80,80,.3); color: #ff8080; display: block; }
+    .auth-msg.success { background: rgba(80,200,120,.12); border: 1px solid rgba(80,200,120,.3); color: #80e0a0; display: block; }
+
+    .forgot-step { display: none; }
+    .forgot-step.active { display: block; }
+
+    @media (max-width: 480px) {
+      .auth-card { padding: 2rem 1.25rem; }
+      .otp-box { width: 40px; height: 48px; font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="auth-bg"></div>
+<div class="auth-card">
+  <div class="auth-logo">
+    <a href="index.html">&#127869;&#65039; Ayo<span class="accent">Foods</span></a>
+  </div>
+
+  <!-- LOGIN PANEL -->
+  <div class="auth-panel active" id="panelLogin">
+    <div class="panel-title">Welcome back &#128075;</div>
+    <div class="panel-subtitle">Sign in to your AyoFoods account</div>
+    <div class="auth-msg" id="loginMsg"></div>
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="field-wrap">
+        <input type="email" id="loginEmail" placeholder="Email address" required autocomplete="email"/>
+        <label>Email address</label>
+      </div>
+      <div class="field-wrap">
+        <input type="password" id="loginPass" placeholder="Password" required autocomplete="current-password"/>
+        <label>Password</label>
+        <button type="button" class="toggle-pw" onclick="togglePw('loginPass',this)"><i class="fas fa-eye"></i></button>
+      </div>
+      <a href="#" class="auth-link forgot-link" onclick="showPanel('panelForgot');return false">Forgot Password?</a>
+      <button type="submit" class="auth-btn" id="loginBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
+    </form>
+    <div class="auth-switch">Don't have an account? <a class="auth-link" onclick="showPanel('panelRegister')">Create Account</a></div>
+  </div>
+
+  <!-- REGISTER PANEL -->
+  <div class="auth-panel" id="panelRegister">
+    <div class="panel-title">Create Account &#128640;</div>
+    <div class="panel-subtitle">Join AyoFoods and start ordering</div>
+    <div class="auth-msg" id="registerMsg"></div>
+    <form id="registerForm" onsubmit="handleRegister(event)">
+      <div class="field-wrap">
+        <input type="text" id="regName" placeholder="Full name" required autocomplete="name"/>
+        <label>Full name</label>
+      </div>
+      <div class="field-wrap">
+        <input type="email" id="regEmail" placeholder="Email address" required autocomplete="email"/>
+        <label>Email address</label>
+      </div>
+      <div class="field-wrap">
+        <input type="tel" id="regPhone" placeholder="Phone number" autocomplete="tel"/>
+        <label>Phone number</label>
+      </div>
+      <div class="field-wrap">
+        <input type="password" id="regPass" placeholder="Password" required autocomplete="new-password"/>
+        <label>Password</label>
+        <button type="button" class="toggle-pw" onclick="togglePw('regPass',this)"><i class="fas fa-eye"></i></button>
+      </div>
+      <div class="field-wrap">
+        <input type="password" id="regConfirm" placeholder="Confirm password" required autocomplete="new-password"/>
+        <label>Confirm password</label>
+        <button type="button" class="toggle-pw" onclick="togglePw('regConfirm',this)"><i class="fas fa-eye"></i></button>
+      </div>
+      <button type="submit" class="auth-btn" id="registerBtn"><i class="fas fa-user-plus"></i> Create Account</button>
+    </form>
+    <div class="auth-switch">Already have an account? <a class="auth-link" onclick="showPanel('panelLogin')">Sign In</a></div>
+  </div>
+
+  <!-- VERIFY EMAIL PANEL -->
+  <div class="auth-panel" id="panelVerify">
+    <div class="panel-title">Verify Email &#128231;</div>
+    <div class="panel-subtitle">Enter the 6-digit code sent to <strong id="verifyEmailDisplay"></strong></div>
+    <div class="auth-msg" id="verifyMsg"></div>
+    <div class="otp-row" id="otpBoxes">
+      <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" aria-label="Digit 1"/>
+      <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" aria-label="Digit 2"/>
+      <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" aria-label="Digit 3"/>
+      <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" aria-label="Digit 4"/>
+      <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" aria-label="Digit 5"/>
+      <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" aria-label="Digit 6"/>
+    </div>
+    <div class="resend-row">
+      <span id="resendTimer">Resend code in <strong id="countdown">60</strong>s</span>
+      <button class="auth-link" id="resendBtn" style="display:none" onclick="resendCode()">Resend Code</button>
+    </div>
+    <button class="auth-btn" onclick="handleVerify()"><i class="fas fa-check-circle"></i> Verify Email</button>
+    <div class="auth-switch"><a class="auth-link" onclick="showPanel('panelLogin')">&#8592; Back to Login</a></div>
+  </div>
+
+  <!-- FORGOT PASSWORD PANEL -->
+  <div class="auth-panel" id="panelForgot">
+    <div class="panel-title">Reset Password &#128273;</div>
+    <div class="auth-msg" id="forgotMsg"></div>
+    <div class="forgot-step active" id="forgotStep1">
+      <div class="panel-subtitle">Enter your email to receive a reset code</div>
+      <div class="field-wrap">
+        <input type="email" id="forgotEmail" placeholder="Email address" required/>
+        <label>Email address</label>
+      </div>
+      <button class="auth-btn" onclick="handleForgotSend()"><i class="fas fa-paper-plane"></i> Send Reset Code</button>
+    </div>
+    <div class="forgot-step" id="forgotStep2">
+      <div class="panel-subtitle">Enter the code and set your new password</div>
+      <div class="otp-row" id="forgotOtpBoxes">
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" aria-label="Digit 1"/>
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" aria-label="Digit 2"/>
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" aria-label="Digit 3"/>
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" aria-label="Digit 4"/>
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" aria-label="Digit 5"/>
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" aria-label="Digit 6"/>
+      </div>
+      <div class="field-wrap">
+        <input type="password" id="newPass" placeholder="New password" required/>
+        <label>New password</label>
+        <button type="button" class="toggle-pw" onclick="togglePw('newPass',this)"><i class="fas fa-eye"></i></button>
+      </div>
+      <div class="field-wrap">
+        <input type="password" id="newPassConfirm" placeholder="Confirm new password" required/>
+        <label>Confirm new password</label>
+        <button type="button" class="toggle-pw" onclick="togglePw('newPassConfirm',this)"><i class="fas fa-eye"></i></button>
+      </div>
+      <button class="auth-btn" onclick="handleResetPassword()"><i class="fas fa-lock"></i> Reset Password</button>
+    </div>
+    <div class="auth-switch"><a class="auth-link" onclick="showPanel('panelLogin')">&#8592; Back to Login</a></div>
+  </div>
+</div>
+
+<script>
+  const API = 'backend/auth.php';
+  let verifyEmail = '';
+  let countdownTimer = null;
+
+  function showPanel(id) {
+    document.querySelectorAll('.auth-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    clearAllMsgs();
+  }
+  function clearAllMsgs() {
+    document.querySelectorAll('.auth-msg').forEach(m => { m.className = 'auth-msg'; m.textContent = ''; });
+  }
+  function showMsg(id, text, type) {
+    const el = document.getElementById(id);
+    el.textContent = text;
+    el.className = 'auth-msg ' + (type || 'error');
+  }
+
+  function togglePw(inputId, btn) {
+    const inp = document.getElementById(inputId);
+    const icon = btn.querySelector('i');
+    if (inp.type === 'password') { inp.type = 'text'; icon.className = 'fas fa-eye-slash'; }
+    else { inp.type = 'password'; icon.className = 'fas fa-eye'; }
+  }
+
+  function initOtpBoxes(containerId) {
+    const boxes = document.querySelectorAll('#' + containerId + ' .otp-box');
+    boxes.forEach((box, i) => {
+      box.addEventListener('input', e => {
+        const val = e.target.value.replace(/\D/g, '');
+        e.target.value = val ? val[0] : '';
+        e.target.classList.toggle('filled', !!val);
+        if (val && i < boxes.length - 1) boxes[i + 1].focus();
+      });
+      box.addEventListener('keydown', e => {
+        if (e.key === 'Backspace' && !box.value && i > 0) {
+          boxes[i - 1].focus(); boxes[i - 1].value = ''; boxes[i - 1].classList.remove('filled');
+        }
+      });
+      box.addEventListener('paste', e => {
+        e.preventDefault();
+        const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+        boxes.forEach((b, j) => { b.value = pasted[j] || ''; b.classList.toggle('filled', !!b.value); });
+        const last = Math.min(pasted.length, boxes.length) - 1;
+        if (last >= 0) boxes[last].focus();
+      });
+    });
+  }
+
+  function getOtpValue(containerId) {
+    return Array.from(document.querySelectorAll('#' + containerId + ' .otp-box')).map(b => b.value).join('');
+  }
+  function clearOtpBoxes(containerId) {
+    document.querySelectorAll('#' + containerId + ' .otp-box').forEach(b => { b.value = ''; b.classList.remove('filled'); });
+  }
+
+  function startCountdown() {
+    let secs = 60;
+    document.getElementById('countdown').textContent = secs;
+    document.getElementById('resendTimer').style.display = 'inline';
+    document.getElementById('resendBtn').style.display = 'none';
+    clearInterval(countdownTimer);
+    countdownTimer = setInterval(() => {
+      secs--;
+      document.getElementById('countdown').textContent = secs;
+      if (secs <= 0) {
+        clearInterval(countdownTimer);
+        document.getElementById('resendTimer').style.display = 'none';
+        document.getElementById('resendBtn').style.display = 'inline';
+      }
+    }, 1000);
+  }
+
+  async function handleLogin(e) {
+    e.preventDefault();
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+    try {
+      const res = await fetch(API + '?action=login', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: document.getElementById('loginEmail').value, password: document.getElementById('loginPass').value })
+      });
+      const json = await res.json();
+      if (json.success) {
+        localStorage.setItem('ayoToken', json.token);
+        localStorage.setItem('ayoUser', JSON.stringify(json.user));
+        const redirect = new URLSearchParams(window.location.search).get('redirect');
+        window.location.href = redirect ? redirect + '.html' : 'index.html';
+      } else {
+        showMsg('loginMsg', json.message || 'Login failed.');
+        if (json.needs_verification) {
+          verifyEmail = json.email;
+          document.getElementById('verifyEmailDisplay').textContent = verifyEmail;
+          setTimeout(() => { showPanel('panelVerify'); startCountdown(); }, 1500);
+        }
+      }
+    } catch { showMsg('loginMsg', 'Network error. Please try again.'); }
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+  }
+
+  async function handleRegister(e) {
+    e.preventDefault();
+    const pass = document.getElementById('regPass').value;
+    const confirm = document.getElementById('regConfirm').value;
+    if (pass !== confirm) { showMsg('registerMsg', 'Passwords do not match.'); return; }
+    if (pass.length < 6) { showMsg('registerMsg', 'Password must be at least 6 characters.'); return; }
+    const btn = document.getElementById('registerBtn');
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
+    try {
+      const res = await fetch(API + '?action=register', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: document.getElementById('regName').value, email: document.getElementById('regEmail').value, phone: document.getElementById('regPhone').value, password: pass })
+      });
+      const json = await res.json();
+      if (json.success) {
+        verifyEmail = document.getElementById('regEmail').value;
+        document.getElementById('verifyEmailDisplay').textContent = verifyEmail;
+        showPanel('panelVerify'); clearOtpBoxes('otpBoxes'); startCountdown();
+      } else { showMsg('registerMsg', json.message || 'Registration failed.'); }
+    } catch { showMsg('registerMsg', 'Network error. Please try again.'); }
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+  }
+
+  async function handleVerify() {
+    const code = getOtpValue('otpBoxes');
+    if (code.length < 6) { showMsg('verifyMsg', 'Please enter all 6 digits.'); return; }
+    try {
+      const res = await fetch(API + '?action=verify_email', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: verifyEmail, code })
+      });
+      const json = await res.json();
+      if (json.success) {
+        showMsg('verifyMsg', 'Email verified! Redirecting to login...', 'success');
+        clearInterval(countdownTimer);
+        setTimeout(() => showPanel('panelLogin'), 1800);
+      } else { showMsg('verifyMsg', json.message || 'Invalid code.'); }
+    } catch { showMsg('verifyMsg', 'Network error. Please try again.'); }
+  }
+
+  async function resendCode() {
+    if (!verifyEmail) return;
+    try {
+      await fetch(API + '?action=forgot_password', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: verifyEmail })
+      });
+    } catch {}
+    startCountdown();
+    showMsg('verifyMsg', 'A new code has been sent to your email.', 'success');
+  }
+
+  async function handleForgotSend() {
+    const email = document.getElementById('forgotEmail').value.trim();
+    if (!email) { showMsg('forgotMsg', 'Please enter your email.'); return; }
+    try {
+      const res = await fetch(API + '?action=forgot_password', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const json = await res.json();
+      showMsg('forgotMsg', json.message || 'Code sent!', 'success');
+      document.getElementById('forgotStep1').classList.remove('active');
+      document.getElementById('forgotStep2').classList.add('active');
+      clearOtpBoxes('forgotOtpBoxes');
+    } catch { showMsg('forgotMsg', 'Network error. Please try again.'); }
+  }
+
+  async function handleResetPassword() {
+    const email = document.getElementById('forgotEmail').value.trim();
+    const code = getOtpValue('forgotOtpBoxes');
+    const pass = document.getElementById('newPass').value;
+    const confirm = document.getElementById('newPassConfirm').value;
+    if (code.length < 6) { showMsg('forgotMsg', 'Please enter all 6 digits.'); return; }
+    if (pass !== confirm) { showMsg('forgotMsg', 'Passwords do not match.'); return; }
+    if (pass.length < 6) { showMsg('forgotMsg', 'Password must be at least 6 characters.'); return; }
+    try {
+      const res = await fetch(API + '?action=reset_password', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code, password: pass })
+      });
+      const json = await res.json();
+      if (json.success) {
+        showMsg('forgotMsg', 'Password reset! Redirecting to login...', 'success');
+        setTimeout(() => {
+          document.getElementById('forgotStep1').classList.add('active');
+          document.getElementById('forgotStep2').classList.remove('active');
+          showPanel('panelLogin');
+        }, 1800);
+      } else { showMsg('forgotMsg', json.message || 'Reset failed.'); }
+    } catch { showMsg('forgotMsg', 'Network error. Please try again.'); }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initOtpBoxes('otpBoxes');
+    initOtpBoxes('forgotOtpBoxes');
+    if (localStorage.getItem('ayoToken')) {
+      const redirect = new URLSearchParams(window.location.search).get('redirect');
+      window.location.href = redirect ? redirect + '.html' : 'index.html';
+    }
+  });
+</script>
+</body>
+</html>

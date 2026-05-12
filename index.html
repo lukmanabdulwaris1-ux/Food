@@ -24,12 +24,16 @@
       <li><a href="#menu">Menu</a></li>
       <li><a href="#how-it-works">How It Works</a></li>
       <li><a href="#contact">Contact</a></li>
+      <li><a href="#" onclick="showMyOrders();return false">My Orders</a></li>
     </ul>
     <div class="nav-actions">
       <a href="cart.html" class="cart-btn" id="cartBtn">
         <i class="fas fa-shopping-cart"></i>
         <span class="cart-count" id="cartCount">0</span>
       </a>
+      <div class="auth-nav" id="authNav">
+        <a href="auth.html" style="display:inline-flex;align-items:center;gap:.4rem;padding:.45rem 1.1rem;background:linear-gradient(135deg,#e85d04,#f48c06);color:#fff;border-radius:50px;font-family:'Poppins',sans-serif;font-size:.85rem;font-weight:600;text-decoration:none">Login</a>
+      </div>
       <button class="hamburger" id="hamburger" aria-label="Toggle menu">
         <span></span><span></span><span></span>
       </button>
@@ -96,7 +100,6 @@
       <button class="tab" data-cat="dessert" onclick="filterMenu('dessert')">🍩 Desserts</button>
     </div>
     <div class="menu-grid" id="menuGrid">
-      <!-- Populated by JS -->
       <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading menu...</div>
     </div>
   </div>
@@ -110,23 +113,11 @@
       <p>Order in 3 simple steps</p>
     </div>
     <div class="steps-grid">
-      <div class="step">
-        <div class="step-icon">🛒</div>
-        <h3>1. Browse & Add</h3>
-        <p>Pick your favourite items from our menu and add them to your cart</p>
-      </div>
+      <div class="step"><div class="step-icon">🛒</div><h3>1. Browse & Add</h3><p>Pick your favourite items from our menu and add them to your cart</p></div>
       <div class="step-arrow"><i class="fas fa-arrow-right"></i></div>
-      <div class="step">
-        <div class="step-icon">📝</div>
-        <h3>2. Checkout</h3>
-        <p>Enter your delivery details and choose your payment method</p>
-      </div>
+      <div class="step"><div class="step-icon">📝</div><h3>2. Checkout</h3><p>Enter your delivery details and choose your payment method</p></div>
       <div class="step-arrow"><i class="fas fa-arrow-right"></i></div>
-      <div class="step">
-        <div class="step-icon">🚀</div>
-        <h3>3. Enjoy!</h3>
-        <p>We prepare and deliver your order fresh to your doorstep</p>
-      </div>
+      <div class="step"><div class="step-icon">🚀</div><h3>3. Enjoy!</h3><p>We prepare and deliver your order fresh to your doorstep</p></div>
     </div>
   </div>
 </section>
@@ -134,25 +125,11 @@
 <!-- TESTIMONIALS -->
 <section class="testimonials">
   <div class="container">
-    <div class="section-header">
-      <h2>What Customers <span class="accent">Say</span></h2>
-    </div>
+    <div class="section-header"><h2>What Customers <span class="accent">Say</span></h2></div>
     <div class="testi-grid">
-      <div class="testi-card">
-        <div class="stars">⭐⭐⭐⭐⭐</div>
-        <p>"The jollof rice is absolutely amazing! Delivered hot and on time. AyoFoods is my go-to!"</p>
-        <div class="testi-author"><strong>Amaka O.</strong> — Lagos</div>
-      </div>
-      <div class="testi-card">
-        <div class="stars">⭐⭐⭐⭐⭐</div>
-        <p>"Best suya I've had in a long time. The Chapman drink paired perfectly. Will order again!"</p>
-        <div class="testi-author"><strong>Tunde B.</strong> — Abuja</div>
-      </div>
-      <div class="testi-card">
-        <div class="stars">⭐⭐⭐⭐⭐</div>
-        <p>"Super fast delivery and the food was still hot. Pounded yam and egusi was on point!"</p>
-        <div class="testi-author"><strong>Chioma E.</strong> — Port Harcourt</div>
-      </div>
+      <div class="testi-card"><div class="stars">⭐⭐⭐⭐⭐</div><p>"The jollof rice is absolutely amazing! Delivered hot and on time. AyoFoods is my go-to!"</p><div class="testi-author"><strong>Amaka O.</strong> — Lagos</div></div>
+      <div class="testi-card"><div class="stars">⭐⭐⭐⭐⭐</div><p>"Best suya I've had in a long time. The Chapman drink paired perfectly. Will order again!"</p><div class="testi-author"><strong>Tunde B.</strong> — Abuja</div></div>
+      <div class="testi-card"><div class="stars">⭐⭐⭐⭐⭐</div><p>"Super fast delivery and the food was still hot. Pounded yam and egusi was on point!"</p><div class="testi-author"><strong>Chioma E.</strong> — Port Harcourt</div></div>
     </div>
   </div>
 </section>
@@ -217,14 +194,12 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <p>&copy; 2026 AyoFoods. All rights reserved.</p>
+      <p>&copy; 2026 AyoFoods. All rights reserved. | <a href="admin.html" style="color:var(--text-muted);text-decoration:none;font-size:.8rem">Admin</a></p>
     </div>
   </div>
 </footer>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
-
 <script src="script.js"></script>
 </body>
 </html>

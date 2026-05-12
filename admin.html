@@ -1,0 +1,586 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AyoFoods Admin</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    body { background: #1a1a2e; min-height: 100vh; }
+    /* Login screen */
+    .admin-login-wrap {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);
+    }
+    .admin-login-card {
+      background: rgba(255,255,255,.04); backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,.1); border-radius: 20px;
+      padding: 2.5rem 2rem; width: 100%; max-width: 400px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.5);
+    }
+    .admin-login-card h2 { font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: .3rem; }
+    .admin-login-card p { color: #a0a0b0; font-size: .85rem; margin-bottom: 1.75rem; }
+    .admin-field { position: relative; margin-bottom: 1.2rem; }
+    .admin-field input {
+      width: 100%; background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12); border-radius: 10px;
+      padding: .9rem 1rem; color: #fff;
+      font-family: 'Poppins',sans-serif; font-size: .92rem; outline: none;
+      transition: border-color .25s;
+    }
+    .admin-field input:focus { border-color: #f48c06; }
+    .admin-field label { display: block; font-size: .8rem; color: #a0a0b0; margin-bottom: .4rem; }
+    .admin-btn {
+      width: 100%; padding: .9rem;
+      background: linear-gradient(135deg,#e85d04,#f48c06);
+      color: #fff; border: none; border-radius: 10px;
+      font-family: 'Poppins',sans-serif; font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: transform .2s, box-shadow .2s;
+    }
+    .admin-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(232,93,4,.4); }
+    .admin-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+    .login-err { color: #ff8080; font-size: .83rem; margin-bottom: .75rem; display: none; }
+    .login-err.show { display: block; }
+
+    /* Dashboard layout */
+    .admin-app { display: none; min-height: 100vh; }
+    .admin-app.active { display: flex; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px; min-height: 100vh; background: #0d0d1a;
+      border-right: 1px solid rgba(255,255,255,.07);
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
+      transition: transform .3s ease;
+    }
+    .sidebar-logo {
+      padding: 1.5rem 1.25rem; font-size: 1.3rem; font-weight: 800;
+      color: #fff; border-bottom: 1px solid rgba(255,255,255,.07);
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .sidebar-logo .accent { color: #f48c06; }
+    .sidebar-nav { flex: 1; padding: 1rem 0; }
+    .nav-item {
+      display: flex; align-items: center; gap: .75rem;
+      padding: .8rem 1.25rem; color: #a0a0b0; cursor: pointer;
+      transition: all .2s; border-left: 3px solid transparent;
+      font-size: .9rem; font-weight: 500;
+    }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,.04); }
+    .nav-item.active { color: #f48c06; border-left-color: #f48c06; background: rgba(244,140,6,.08); }
+    .nav-item i { width: 18px; text-align: center; }
+    .sidebar-footer { padding: 1rem 1.25rem; border-top: 1px solid rgba(255,255,255,.07); }
+    .logout-btn {
+      display: flex; align-items: center; gap: .6rem;
+      color: #ff8080; cursor: pointer; font-size: .88rem;
+      background: none; border: none; font-family: inherit;
+      padding: .5rem 0; transition: opacity .2s;
+    }
+    .logout-btn:hover { opacity: .75; }
+
+    /* Main content */
+    .admin-main { margin-left: 240px; flex: 1; padding: 2rem; min-height: 100vh; }
+    .admin-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
+    }
+    .admin-topbar h1 { font-size: 1.6rem; font-weight: 800; color: #fff; }
+    .admin-badge { font-size: .78rem; background: rgba(244,140,6,.15); color: #f48c06; padding: .3rem .75rem; border-radius: 50px; border: 1px solid rgba(244,140,6,.3); }
+    .hamburger-admin {
+      display: none; background: none; border: none; color: #fff;
+      font-size: 1.3rem; cursor: pointer; padding: .3rem;
+    }
+
+    /* Tabs */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Stat cards */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(200px,1fr)); gap: 1.25rem; margin-bottom: 2rem; }
+    .stat-card {
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+      border-radius: 14px; padding: 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .stat-icon {
+      width: 50px; height: 50px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; flex-shrink: 0;
+    }
+    .stat-icon.orange { background: rgba(232,93,4,.15); color: #e85d04; }
+    .stat-icon.yellow { background: rgba(244,140,6,.15); color: #f48c06; }
+    .stat-icon.green  { background: rgba(80,200,120,.15); color: #50c878; }
+    .stat-icon.blue   { background: rgba(80,150,255,.15); color: #5096ff; }
+    .stat-info { flex: 1; }
+    .stat-val { font-size: 1.6rem; font-weight: 800; color: #fff; line-height: 1; }
+    .stat-label { font-size: .78rem; color: #a0a0b0; margin-top: .2rem; }
+
+    /* Table */
+    .table-card { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07); border-radius: 14px; overflow: hidden; }
+    .table-header { padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem; border-bottom: 1px solid rgba(255,255,255,.07); }
+    .table-header h3 { font-size: 1rem; font-weight: 700; color: #fff; }
+    .table-search { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; }
+    .table-search input, .table-search select {
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 8px; padding: .5rem .9rem; color: #fff;
+      font-family: 'Poppins',sans-serif; font-size: .85rem; outline: none;
+    }
+    .table-search input:focus, .table-search select:focus { border-color: #f48c06; }
+    .table-search select option { background: #1a1a2e; }
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th { padding: .85rem 1rem; text-align: left; font-size: .78rem; font-weight: 600; color: #a0a0b0; text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid rgba(255,255,255,.07); }
+    .data-table td { padding: .85rem 1rem; font-size: .88rem; color: #e0e0e0; border-bottom: 1px solid rgba(255,255,255,.04); vertical-align: middle; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: rgba(255,255,255,.02); }
+    .table-wrap { overflow-x: auto; }
+
+    /* Status badges */
+    .badge { display: inline-block; padding: .25rem .7rem; border-radius: 50px; font-size: .75rem; font-weight: 600; }
+    .badge-pending   { background: rgba(244,140,6,.15); color: #f48c06; }
+    .badge-confirmed { background: rgba(80,150,255,.15); color: #5096ff; }
+    .badge-preparing { background: rgba(150,80,255,.15); color: #9650ff; }
+    .badge-delivered { background: rgba(80,200,120,.15); color: #50c878; }
+    .badge-cancelled { background: rgba(255,80,80,.15); color: #ff5050; }
+    .badge-verified  { background: rgba(80,200,120,.15); color: #50c878; }
+    .badge-unverified{ background: rgba(255,80,80,.15); color: #ff5050; }
+
+    /* Status dropdown */
+    .status-select {
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 6px; padding: .3rem .6rem; color: #fff;
+      font-family: 'Poppins',sans-serif; font-size: .8rem; cursor: pointer; outline: none;
+    }
+    .status-select option { background: #1a1a2e; }
+
+    /* Loading */
+    .loading-row td { text-align: center; padding: 2rem; color: #a0a0b0; }
+
+    /* Notification modal */
+    .modal-overlay { position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,.7); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .3s; padding: 1rem; }
+    .modal-overlay.active { opacity: 1; pointer-events: all; }
+    .modal-box { background: #16213e; border-radius: 16px; padding: 2rem; max-width: 440px; width: 100%; border: 1px solid rgba(255,255,255,.1); }
+    .modal-box h3 { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem; }
+    .modal-field { margin-bottom: 1rem; }
+    .modal-field label { display: block; font-size: .8rem; color: #a0a0b0; margin-bottom: .35rem; }
+    .modal-field input, .modal-field textarea {
+      width: 100%; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 8px; padding: .75rem 1rem; color: #fff;
+      font-family: 'Poppins',sans-serif; font-size: .9rem; outline: none;
+    }
+    .modal-field input:focus, .modal-field textarea:focus { border-color: #f48c06; }
+    .modal-field textarea { resize: vertical; min-height: 100px; }
+    .modal-actions { display: flex; gap: .75rem; justify-content: flex-end; margin-top: 1.25rem; }
+    .btn-sm { padding: .5rem 1.2rem; border-radius: 8px; font-family: 'Poppins',sans-serif; font-size: .85rem; font-weight: 600; cursor: pointer; border: none; transition: all .2s; }
+    .btn-primary-sm { background: linear-gradient(135deg,#e85d04,#f48c06); color: #fff; }
+    .btn-ghost-sm { background: rgba(255,255,255,.08); color: #e0e0e0; }
+
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .admin-main { margin-left: 0; padding: 1rem; }
+      .hamburger-admin { display: block; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ADMIN LOGIN -->
+<div class="admin-login-wrap" id="adminLoginWrap">
+  <div class="admin-login-card">
+    <div style="text-align:center;margin-bottom:1.5rem;font-size:1.5rem;font-weight:800;color:#fff">
+      &#127869;&#65039; Ayo<span class="accent">Foods</span> <span style="font-size:.9rem;color:#a0a0b0;font-weight:400">Admin</span>
+    </div>
+    <h2>Admin Login</h2>
+    <p>Sign in to manage your restaurant</p>
+    <div class="login-err" id="loginErr"></div>
+    <div class="admin-field">
+      <label>Email Address</label>
+      <input type="email" id="adminEmail" placeholder="admin@ayofoods.com" autocomplete="email"/>
+    </div>
+    <div class="admin-field">
+      <label>Password</label>
+      <input type="password" id="adminPass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doAdminLogin()"/>
+    </div>
+    <button class="admin-btn" id="adminLoginBtn" onclick="doAdminLogin()">
+      <i class="fas fa-sign-in-alt"></i> Sign In
+    </button>
+  </div>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div class="admin-app" id="adminApp">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">&#127869;&#65039; Ayo<span class="accent">Foods</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" onclick="switchTab('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
+      <div class="nav-item" onclick="switchTab('orders')"><i class="fas fa-receipt"></i> Orders</div>
+      <div class="nav-item" onclick="switchTab('users')"><i class="fas fa-users"></i> Users</div>
+      <div class="nav-item" onclick="openNotifModal()"><i class="fas fa-bell"></i> Notifications</div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div style="display:flex;align-items:center;gap:1rem">
+        <button class="hamburger-admin" onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="fas fa-bars"></i></button>
+        <h1 id="pageTitle">Dashboard</h1>
+      </div>
+      <span class="admin-badge" id="adminNameBadge">Admin</span>
+    </div>
+
+    <!-- Dashboard Tab -->
+    <div class="tab-content active" id="tabDashboard">
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card"><div class="stat-icon orange"><i class="fas fa-receipt"></i></div><div class="stat-info"><div class="stat-val" id="statTotal">—</div><div class="stat-label">Total Orders</div></div></div>
+        <div class="stat-card"><div class="stat-icon yellow"><i class="fas fa-clock"></i></div><div class="stat-info"><div class="stat-val" id="statPending">—</div><div class="stat-label">Pending Orders</div></div></div>
+        <div class="stat-card"><div class="stat-icon green"><i class="fas fa-naira-sign"></i></div><div class="stat-info"><div class="stat-val" id="statRevenue">—</div><div class="stat-label">Total Revenue</div></div></div>
+        <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-users"></i></div><div class="stat-info"><div class="stat-val" id="statUsers">—</div><div class="stat-label">Registered Users</div></div></div>
+      </div>
+      <div style="color:#a0a0b0;font-size:.88rem;text-align:center;margin-top:2rem">
+        <i class="fas fa-info-circle"></i> Use the sidebar to manage orders and users.
+      </div>
+    </div>
+
+    <!-- Orders Tab -->
+    <div class="tab-content" id="tabOrders">
+      <div class="table-card">
+        <div class="table-header">
+          <h3><i class="fas fa-receipt"></i> All Orders</h3>
+          <div class="table-search">
+            <input type="text" id="orderSearch" placeholder="Search customer..." oninput="filterOrders()"/>
+            <select id="statusFilter" onchange="loadOrders()">
+              <option value="">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="preparing">Preparing</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th>
+                <th>Payment</th><th>Status</th><th>Date</th><th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="ordersBody"><tr class="loading-row"><td colspan="8"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Tab -->
+    <div class="tab-content" id="tabUsers">
+      <div class="table-card">
+        <div class="table-header">
+          <h3><i class="fas fa-users"></i> Registered Users</h3>
+          <input type="text" id="userSearch" placeholder="Search users..." oninput="filterUsers()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.5rem .9rem;color:#fff;font-family:'Poppins',sans-serif;font-size:.85rem;outline:none"/>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>Name</th><th>Email</th><th>Phone</th><th>Verified</th><th>Joined</th><th>Action</th></tr>
+            </thead>
+            <tbody id="usersBody"><tr class="loading-row"><td colspan="6"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Notification Modal -->
+<div class="modal-overlay" id="notifModal">
+  <div class="modal-box">
+    <h3><i class="fas fa-bell"></i> Send Notification</h3>
+    <div class="modal-field"><label>Recipient Email</label><input type="email" id="notifEmail" placeholder="user@example.com"/></div>
+    <div class="modal-field"><label>Subject</label><input type="text" id="notifSubject" placeholder="Order Update"/></div>
+    <div class="modal-field"><label>Message</label><textarea id="notifMessage" placeholder="Your message here..."></textarea></div>
+    <div id="notifResult" style="font-size:.83rem;margin-top:.5rem"></div>
+    <div class="modal-actions">
+      <button class="btn-sm btn-ghost-sm" onclick="closeNotifModal()">Cancel</button>
+      <button class="btn-sm btn-primary-sm" onclick="sendNotification()"><i class="fas fa-paper-plane"></i> Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const ADMIN_API = 'backend/admin.php';
+  let adminToken = '';
+  let allOrders = [];
+  let allUsers  = [];
+
+  // ── Auth ──────────────────────────────────────────────────────────────────
+  async function doAdminLogin() {
+    const btn = document.getElementById('adminLoginBtn');
+    const err = document.getElementById('loginErr');
+    err.classList.remove('show');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+    try {
+      const res = await fetch(ADMIN_API + '?action=login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: document.getElementById('adminEmail').value,
+          password: document.getElementById('adminPass').value
+        })
+      });
+      const json = await res.json();
+      if (json.success) {
+        adminToken = json.token;
+        sessionStorage.setItem('adminToken', adminToken);
+        sessionStorage.setItem('adminName', json.admin.name);
+        showDashboard(json.admin.name);
+      } else {
+        err.textContent = json.message || 'Invalid credentials.';
+        err.classList.add('show');
+      }
+    } catch {
+      err.textContent = 'Network error. Please try again.';
+      err.classList.add('show');
+    }
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+  }
+
+  function showDashboard(name) {
+    document.getElementById('adminLoginWrap').style.display = 'none';
+    document.getElementById('adminApp').classList.add('active');
+    document.getElementById('adminNameBadge').textContent = name || 'Admin';
+    loadDashboard();
+  }
+
+  function adminLogout() {
+    adminToken = '';
+    sessionStorage.removeItem('adminToken');
+    sessionStorage.removeItem('adminName');
+    document.getElementById('adminLoginWrap').style.display = 'flex';
+    document.getElementById('adminApp').classList.remove('active');
+  }
+
+  // ── Tab switching ─────────────────────────────────────────────────────────
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => {
+      if (n.textContent.trim().toLowerCase().includes(tab.toLowerCase())) n.classList.add('active');
+    });
+    document.getElementById('pageTitle').textContent = tab.charAt(0).toUpperCase() + tab.slice(1);
+    if (tab === 'dashboard') loadDashboard();
+    if (tab === 'orders')    loadOrders();
+    if (tab === 'users')     loadUsers();
+    // Close sidebar on mobile
+    document.getElementById('sidebar').classList.remove('open');
+  }
+
+  // ── API helper ────────────────────────────────────────────────────────────
+  async function adminFetch(action, params) {
+    const url = ADMIN_API + '?action=' + action + (params ? '&' + new URLSearchParams(params) : '');
+    const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + adminToken } });
+    return res.json();
+  }
+
+  // ── Dashboard ─────────────────────────────────────────────────────────────
+  async function loadDashboard() {
+    try {
+      const json = await adminFetch('dashboard');
+      if (json.success) {
+        animateCounter('statTotal',   json.data.total_orders);
+        animateCounter('statPending', json.data.pending_orders);
+        document.getElementById('statRevenue').textContent = '₦' + Number(json.data.total_revenue).toLocaleString();
+        animateCounter('statUsers',   json.data.total_users);
+      }
+    } catch {}
+  }
+
+  function animateCounter(id, target) {
+    const el = document.getElementById(id);
+    let current = 0;
+    const step = Math.ceil(target / 40);
+    const timer = setInterval(() => {
+      current = Math.min(current + step, target);
+      el.textContent = current.toLocaleString();
+      if (current >= target) clearInterval(timer);
+    }, 30);
+  }
+
+  // ── Orders ────────────────────────────────────────────────────────────────
+  async function loadOrders() {
+    const status = document.getElementById('statusFilter').value;
+    document.getElementById('ordersBody').innerHTML = '<tr class="loading-row"><td colspan="8"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
+    try {
+      const json = await adminFetch('orders', status ? { status } : null);
+      if (json.success) {
+        allOrders = json.data;
+        renderOrders(allOrders);
+      }
+    } catch {
+      document.getElementById('ordersBody').innerHTML = '<tr class="loading-row"><td colspan="8">Failed to load orders.</td></tr>';
+    }
+  }
+
+  function renderOrders(orders) {
+    const tbody = document.getElementById('ordersBody');
+    if (!orders.length) {
+      tbody.innerHTML = '<tr class="loading-row"><td colspan="8">No orders found.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = orders.map(o => {
+      const items = Array.isArray(o.items) ? o.items.map(i => i.name + ' x' + i.qty).join(', ') : '—';
+      const customer = o.user_name || o.customer_name;
+      const date = new Date(o.created_at).toLocaleDateString('en-NG', { day:'2-digit', month:'short', year:'numeric' });
+      return `<tr>
+        <td><strong>#${o.id}</strong></td>
+        <td>${escHtml(customer)}<br><small style="color:#a0a0b0">${escHtml(o.customer_phone)}</small></td>
+        <td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${escHtml(items)}">${escHtml(items)}</td>
+        <td><strong style="color:#f48c06">₦${Number(o.total_amount).toLocaleString()}</strong></td>
+        <td>${o.payment_method}</td>
+        <td><span class="badge badge-${o.status}">${o.status}</span></td>
+        <td>${date}</td>
+        <td>
+          <select class="status-select" onchange="updateOrderStatus(${o.id},this.value)">
+            ${['pending','confirmed','preparing','delivered','cancelled'].map(s =>
+              `<option value="${s}" ${s===o.status?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`
+            ).join('')}
+          </select>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  function filterOrders() {
+    const q = document.getElementById('orderSearch').value.toLowerCase();
+    renderOrders(allOrders.filter(o =>
+      (o.customer_name||'').toLowerCase().includes(q) ||
+      (o.user_name||'').toLowerCase().includes(q) ||
+      String(o.id).includes(q)
+    ));
+  }
+
+  async function updateOrderStatus(orderId, status) {
+    try {
+      const res = await fetch(ADMIN_API + '?action=update_order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken },
+        body: JSON.stringify({ order_id: orderId, status })
+      });
+      const json = await res.json();
+      if (!json.success) alert('Failed to update: ' + (json.message || 'Unknown error'));
+      else {
+        const o = allOrders.find(x => x.id === orderId);
+        if (o) o.status = status;
+      }
+    } catch { alert('Network error.'); }
+  }
+
+  // ── Users ─────────────────────────────────────────────────────────────────
+  async function loadUsers() {
+    document.getElementById('usersBody').innerHTML = '<tr class="loading-row"><td colspan="6"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
+    try {
+      const json = await adminFetch('users');
+      if (json.success) {
+        allUsers = json.data;
+        renderUsers(allUsers);
+      }
+    } catch {
+      document.getElementById('usersBody').innerHTML = '<tr class="loading-row"><td colspan="6">Failed to load users.</td></tr>';
+    }
+  }
+
+  function renderUsers(users) {
+    const tbody = document.getElementById('usersBody');
+    if (!users.length) { tbody.innerHTML = '<tr class="loading-row"><td colspan="6">No users found.</td></tr>'; return; }
+    tbody.innerHTML = users.map(u => {
+      const date = new Date(u.created_at).toLocaleDateString('en-NG', { day:'2-digit', month:'short', year:'numeric' });
+      return `<tr>
+        <td>${escHtml(u.name)}</td>
+        <td>${escHtml(u.email)}</td>
+        <td>${escHtml(u.phone||'—')}</td>
+        <td><span class="badge ${u.is_verified?'badge-verified':'badge-unverified'}">${u.is_verified?'Verified':'Unverified'}</span></td>
+        <td>${date}</td>
+        <td><button class="btn-sm btn-primary-sm" onclick="prefillNotif('${escHtml(u.email)}')"><i class="fas fa-bell"></i></button></td>
+      </tr>`;
+    }).join('');
+  }
+
+  function filterUsers() {
+    const q = document.getElementById('userSearch').value.toLowerCase();
+    renderUsers(allUsers.filter(u =>
+      (u.name||'').toLowerCase().includes(q) ||
+      (u.email||'').toLowerCase().includes(q)
+    ));
+  }
+
+  // ── Notifications ─────────────────────────────────────────────────────────
+  function openNotifModal() { document.getElementById('notifModal').classList.add('active'); }
+  function closeNotifModal() { document.getElementById('notifModal').classList.remove('active'); }
+  function prefillNotif(email) {
+    document.getElementById('notifEmail').value = email;
+    openNotifModal();
+  }
+
+  async function sendNotification() {
+    const email   = document.getElementById('notifEmail').value.trim();
+    const subject = document.getElementById('notifSubject').value.trim();
+    const message = document.getElementById('notifMessage').value.trim();
+    const result  = document.getElementById('notifResult');
+    if (!email || !subject || !message) { result.style.color='#ff8080'; result.textContent='All fields are required.'; return; }
+    result.style.color='#a0a0b0'; result.textContent='Sending...';
+    try {
+      const res = await fetch(ADMIN_API + '?action=send_notification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken },
+        body: JSON.stringify({ email, subject, message })
+      });
+      const json = await res.json();
+      if (json.success) {
+        result.style.color='#50c878'; result.textContent='Notification sent successfully!';
+        setTimeout(closeNotifModal, 1500);
+      } else {
+        result.style.color='#ff8080'; result.textContent = json.message || 'Failed to send.';
+      }
+    } catch { result.style.color='#ff8080'; result.textContent='Network error.'; }
+  }
+
+  // ── Utility ───────────────────────────────────────────────────────────────
+  function escHtml(str) {
+    return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    const saved = sessionStorage.getItem('adminToken');
+    if (saved) {
+      adminToken = saved;
+      showDashboard(sessionStorage.getItem('adminName') || 'Admin');
+    }
+    // Close sidebar on outside click (mobile)
+    document.addEventListener('click', e => {
+      const sidebar = document.getElementById('sidebar');
+      if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && !e.target.closest('.hamburger-admin')) {
+        sidebar.classList.remove('open');
+      }
+    });
+  });
+</script>
+</body>
+</html>

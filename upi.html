@@ -1,0 +1,403 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AyoFoods — Payment</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    body { min-height: 100vh; background: #1a1a2e; padding: 80px 1rem 3rem; }
+    .pay-wrap { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 340px 1fr; gap: 1.5rem; align-items: start; }
+    /* Order summary */
+    .order-summary-card {
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px; padding: 1.5rem; position: sticky; top: 90px;
+    }
+    .order-summary-card h3 { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem; }
+    .sum-item { display: flex; justify-content: space-between; padding: .55rem 0; border-bottom: 1px solid rgba(255,255,255,.05); font-size: .88rem; }
+    .sum-item:last-of-type { border-bottom: none; }
+    .sum-total { display: flex; justify-content: space-between; padding-top: .75rem; margin-top: .5rem; border-top: 1px solid rgba(255,255,255,.1); font-size: 1.05rem; font-weight: 800; color: #fff; }
+    .sum-total span:last-child { color: #f48c06; }
+    /* Payment card */
+    .pay-card {
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px; padding: 1.75rem;
+    }
+    .pay-card h2 { font-size: 1.3rem; font-weight: 800; color: #fff; margin-bottom: 1.5rem; }
+    /* Tabs */
+    .pay-tabs { display: flex; gap: .5rem; margin-bottom: 1.75rem; flex-wrap: wrap; }
+    .pay-tab {
+      padding: .55rem 1.2rem; border-radius: 8px;
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+      color: #a0a0b0; font-family: 'Poppins',sans-serif; font-size: .88rem; font-weight: 500;
+      cursor: pointer; transition: all .2s;
+    }
+    .pay-tab.active { background: linear-gradient(135deg,#e85d04,#f48c06); color: #fff; border-color: transparent; }
+    .pay-panel { display: none; }
+    .pay-panel.active { display: block; }
+    /* Input */
+    .pay-field { margin-bottom: 1.2rem; }
+    .pay-field label { display: block; font-size: .8rem; color: #a0a0b0; margin-bottom: .4rem; }
+    .pay-field input {
+      width: 100%; background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12); border-radius: 10px;
+      padding: .85rem 1rem; color: #fff;
+      font-family: 'Poppins',sans-serif; font-size: .95rem; outline: none;
+      transition: border-color .25s;
+    }
+    .pay-field input:focus { border-color: #f48c06; box-shadow: 0 0 0 3px rgba(244,140,6,.12); }
+    .pay-btn {
+      width: 100%; padding: .9rem;
+      background: linear-gradient(135deg,#e85d04,#f48c06);
+      color: #fff; border: none; border-radius: 10px;
+      font-family: 'Poppins',sans-serif; font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: transform .2s, box-shadow .2s; margin-top: .5rem;
+    }
+    .pay-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(232,93,4,.4); }
+    .pay-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+    /* QR box */
+    .qr-box {
+      background: rgba(255,255,255,.06); border: 2px dashed rgba(244,140,6,.4);
+      border-radius: 16px; padding: 2rem; text-align: center; margin: 1.25rem 0;
+    }
+    .qr-svg { width: 140px; height: 140px; margin: 0 auto 1rem; display: block; }
+    .qr-label { font-size: .82rem; color: #a0a0b0; }
+    /* Card preview */
+    .card-preview-wrap { perspective: 1000px; margin-bottom: 1.5rem; }
+    .card-preview {
+      width: 100%; max-width: 340px; height: 190px; border-radius: 16px;
+      background: linear-gradient(135deg,#0f3460,#16213e);
+      border: 1px solid rgba(255,255,255,.15);
+      padding: 1.5rem; position: relative;
+      transform-style: preserve-3d; transition: transform .6s ease;
+      box-shadow: 0 10px 30px rgba(0,0,0,.4);
+    }
+    .card-preview.flipped { transform: rotateY(180deg); }
+    .card-front, .card-back { position: absolute; inset: 0; padding: 1.5rem; backface-visibility: hidden; border-radius: 16px; }
+    .card-back { background: linear-gradient(135deg,#16213e,#0f3460); transform: rotateY(180deg); display: flex; flex-direction: column; justify-content: center; }
+    .card-chip { width: 40px; height: 30px; background: linear-gradient(135deg,#f48c06,#e85d04); border-radius: 6px; margin-bottom: 1rem; }
+    .card-number { font-size: 1.1rem; font-weight: 700; letter-spacing: .15em; color: #fff; margin-bottom: .75rem; font-family: monospace; }
+    .card-info { display: flex; justify-content: space-between; font-size: .75rem; color: rgba(255,255,255,.7); }
+    .card-brand { position: absolute; top: 1.25rem; right: 1.25rem; font-size: 1.5rem; color: #f48c06; }
+    .cvv-strip { background: rgba(0,0,0,.4); height: 40px; border-radius: 6px; margin-bottom: 1rem; }
+    .cvv-display { background: rgba(255,255,255,.1); border-radius: 6px; padding: .5rem 1rem; text-align: right; font-family: monospace; color: #fff; font-size: .9rem; }
+    /* Bank details */
+    .bank-detail { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,.05); border-radius: 10px; padding: .85rem 1rem; margin-bottom: .75rem; }
+    .bank-detail-info { font-size: .88rem; }
+    .bank-detail-info span { display: block; color: #a0a0b0; font-size: .75rem; }
+    .copy-btn { background: rgba(244,140,6,.15); border: 1px solid rgba(244,140,6,.3); color: #f48c06; border-radius: 6px; padding: .35rem .75rem; font-size: .78rem; cursor: pointer; font-family: 'Poppins',sans-serif; transition: all .2s; }
+    .copy-btn:hover { background: rgba(244,140,6,.25); }
+    /* Success screen */
+    .success-screen {
+      display: none; text-align: center; padding: 2rem 1rem;
+      animation: fadeSlide .4s ease;
+    }
+    .success-screen.active { display: block; }
+    @keyframes fadeSlide { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    .success-check {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg,#50c878,#2ecc71);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; color: #fff; margin: 0 auto 1.5rem;
+      animation: popIn .5s cubic-bezier(.175,.885,.32,1.275);
+    }
+    @keyframes popIn { from { transform:scale(0); } to { transform:scale(1); } }
+    .success-screen h2 { font-size: 1.6rem; font-weight: 800; color: #fff; margin-bottom: .5rem; }
+    .success-screen p { color: #a0a0b0; margin-bottom: .5rem; }
+    .success-order-id { font-size: 1rem; font-weight: 700; color: #f48c06; margin: .75rem 0 1.5rem; }
+    .delivery-badge { display: inline-flex; align-items: center; gap: .5rem; background: rgba(80,200,120,.12); border: 1px solid rgba(80,200,120,.3); color: #50c878; padding: .5rem 1.2rem; border-radius: 50px; font-size: .88rem; font-weight: 600; margin-bottom: 1.5rem; }
+    @media (max-width: 768px) { .pay-wrap { grid-template-columns: 1fr; } .order-summary-card { position: static; } }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar" id="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="logo"><span class="logo-icon">&#127869;&#65039;</span><span>Ayo<span class="accent">Foods</span></span></a>
+    <div class="nav-actions">
+      <a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i><span class="cart-count" id="cartCount">0</span></a>
+    </div>
+  </div>
+</nav>
+
+<div class="pay-wrap">
+  <!-- Order Summary -->
+  <div class="order-summary-card">
+    <h3><i class="fas fa-receipt"></i> Order Summary</h3>
+    <div id="summaryItems"></div>
+    <div class="sum-total"><span>Total</span><span id="summaryTotal">₦0</span></div>
+    <div style="margin-top:1rem;font-size:.8rem;color:#a0a0b0;text-align:center">
+      <i class="fas fa-shield-alt" style="color:#50c878"></i> Secure payment
+    </div>
+  </div>
+
+  <!-- Payment -->
+  <div class="pay-card" id="payCard">
+    <h2><i class="fas fa-credit-card" style="color:#f48c06"></i> Complete Payment</h2>
+
+    <div class="pay-tabs">
+      <button class="pay-tab active" onclick="switchPayTab('upi',this)"><i class="fas fa-mobile-alt"></i> UPI</button>
+      <button class="pay-tab" onclick="switchPayTab('card',this)"><i class="fas fa-credit-card"></i> Card</button>
+      <button class="pay-tab" onclick="switchPayTab('bank',this)"><i class="fas fa-university"></i> Bank Transfer</button>
+    </div>
+
+    <!-- UPI Panel -->
+    <div class="pay-panel active" id="panelUpi">
+      <div class="pay-field">
+        <label>UPI ID</label>
+        <input type="text" id="upiId" placeholder="yourname@upi" autocomplete="off"/>
+      </div>
+      <div class="qr-box">
+        <svg class="qr-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="100" fill="#0f3460" rx="8"/>
+          <!-- QR pattern simulation -->
+          <rect x="10" y="10" width="30" height="30" fill="none" stroke="#f48c06" stroke-width="3" rx="2"/>
+          <rect x="15" y="15" width="20" height="20" fill="#f48c06" rx="1"/>
+          <rect x="60" y="10" width="30" height="30" fill="none" stroke="#f48c06" stroke-width="3" rx="2"/>
+          <rect x="65" y="15" width="20" height="20" fill="#f48c06" rx="1"/>
+          <rect x="10" y="60" width="30" height="30" fill="none" stroke="#f48c06" stroke-width="3" rx="2"/>
+          <rect x="15" y="65" width="20" height="20" fill="#f48c06" rx="1"/>
+          <rect x="45" y="10" width="5" height="5" fill="#f48c06"/>
+          <rect x="45" y="20" width="5" height="5" fill="#f48c06"/>
+          <rect x="45" y="30" width="5" height="5" fill="#f48c06"/>
+          <rect x="55" y="45" width="5" height="5" fill="#f48c06"/>
+          <rect x="45" y="45" width="5" height="5" fill="#f48c06"/>
+          <rect x="60" y="45" width="5" height="5" fill="#f48c06"/>
+          <rect x="70" y="45" width="5" height="5" fill="#f48c06"/>
+          <rect x="80" y="45" width="5" height="5" fill="#f48c06"/>
+          <rect x="60" y="55" width="5" height="5" fill="#f48c06"/>
+          <rect x="70" y="60" width="5" height="5" fill="#f48c06"/>
+          <rect x="80" y="55" width="5" height="5" fill="#f48c06"/>
+          <rect x="60" y="70" width="5" height="5" fill="#f48c06"/>
+          <rect x="60" y="80" width="5" height="5" fill="#f48c06"/>
+          <rect x="70" y="75" width="5" height="5" fill="#f48c06"/>
+          <rect x="80" y="70" width="5" height="5" fill="#f48c06"/>
+          <rect x="80" y="80" width="5" height="5" fill="#f48c06"/>
+          <rect x="10" y="45" width="5" height="5" fill="#f48c06"/>
+          <rect x="20" y="45" width="5" height="5" fill="#f48c06"/>
+          <rect x="30" y="45" width="5" height="5" fill="#f48c06"/>
+          <rect x="10" y="55" width="5" height="5" fill="#f48c06"/>
+          <rect x="25" y="55" width="5" height="5" fill="#f48c06"/>
+          <rect x="35" y="55" width="5" height="5" fill="#f48c06"/>
+        </svg>
+        <div class="qr-label"><i class="fas fa-qrcode"></i> Scan with any UPI app to pay</div>
+        <div style="font-size:.75rem;color:#f48c06;margin-top:.5rem;font-weight:600">ayofoods@upi</div>
+      </div>
+      <button class="pay-btn" onclick="processPayment('upi')"><i class="fas fa-bolt"></i> Pay Now</button>
+    </div>
+
+    <!-- Card Panel -->
+    <div class="pay-panel" id="panelCard">
+      <div class="card-preview-wrap">
+        <div class="card-preview" id="cardPreview">
+          <div class="card-front">
+            <div class="card-chip"></div>
+            <div class="card-number" id="previewNumber">•••• •••• •••• ••••</div>
+            <div class="card-info">
+              <div><div style="font-size:.65rem;color:rgba(255,255,255,.5)">CARD HOLDER</div><div id="previewName">YOUR NAME</div></div>
+              <div><div style="font-size:.65rem;color:rgba(255,255,255,.5)">EXPIRES</div><div id="previewExpiry">MM/YY</div></div>
+            </div>
+            <div class="card-brand"><i class="fab fa-cc-visa"></i></div>
+          </div>
+          <div class="card-back">
+            <div class="cvv-strip"></div>
+            <div class="cvv-display" id="previewCvv">•••</div>
+          </div>
+        </div>
+      </div>
+      <div class="pay-field">
+        <label>Card Number</label>
+        <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCardNumber(this)" autocomplete="cc-number"/>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div class="pay-field">
+          <label>Expiry (MM/YY)</label>
+          <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)" autocomplete="cc-exp"/>
+        </div>
+        <div class="pay-field">
+          <label>CVV</label>
+          <input type="password" id="cardCvv" placeholder="•••" maxlength="4" oninput="updateCvvPreview(this)" onfocus="flipCard(true)" onblur="flipCard(false)" autocomplete="cc-csc"/>
+        </div>
+      </div>
+      <div class="pay-field">
+        <label>Cardholder Name</label>
+        <input type="text" id="cardName" placeholder="John Doe" oninput="updateNamePreview(this)" autocomplete="cc-name"/>
+      </div>
+      <button class="pay-btn" onclick="processPayment('card')"><i class="fas fa-lock"></i> Pay Securely</button>
+    </div>
+
+    <!-- Bank Transfer Panel -->
+    <div class="pay-panel" id="panelBank">
+      <p style="color:#a0a0b0;font-size:.88rem;margin-bottom:1.25rem">Transfer the exact amount to the account below, then click confirm.</p>
+      <div class="bank-detail">
+        <div class="bank-detail-info"><strong>1234567890</strong><span>Account Number</span></div>
+        <button class="copy-btn" onclick="copyText('1234567890',this)"><i class="fas fa-copy"></i> Copy</button>
+      </div>
+      <div class="bank-detail">
+        <div class="bank-detail-info"><strong>GTBank</strong><span>Bank Name</span></div>
+        <button class="copy-btn" onclick="copyText('GTBank',this)"><i class="fas fa-copy"></i> Copy</button>
+      </div>
+      <div class="bank-detail">
+        <div class="bank-detail-info"><strong>AyoFoods Ltd</strong><span>Account Name</span></div>
+        <button class="copy-btn" onclick="copyText('AyoFoods Ltd',this)"><i class="fas fa-copy"></i> Copy</button>
+      </div>
+      <div class="bank-detail">
+        <div class="bank-detail-info"><strong id="bankAmount">₦0</strong><span>Amount to Transfer</span></div>
+        <button class="copy-btn" onclick="copyText(document.getElementById('bankAmount').textContent,this)"><i class="fas fa-copy"></i> Copy</button>
+      </div>
+      <button class="pay-btn" onclick="processPayment('transfer')" style="margin-top:1rem"><i class="fas fa-check-circle"></i> I've Transferred — Confirm Order</button>
+    </div>
+
+    <!-- Success Screen -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-check"><i class="fas fa-check"></i></div>
+      <h2>Payment Successful!</h2>
+      <p>Your order has been placed and is being prepared.</p>
+      <div class="success-order-id" id="successOrderId">Order #—</div>
+      <div class="delivery-badge"><i class="fas fa-truck"></i> Estimated delivery: 30–45 minutes</div>
+      <a href="index.html" class="pay-btn" style="display:inline-flex;align-items:center;justify-content:center;gap:.5rem;text-decoration:none;max-width:280px;margin:0 auto">
+        <i class="fas fa-home"></i> Back to Home
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  const ORDER_API = 'backend/orders.php';
+  let pendingOrder = null;
+
+  // ── Load order summary ────────────────────────────────────────────────────
+  function loadSummary() {
+    pendingOrder = JSON.parse(localStorage.getItem('pendingOrder') || 'null');
+    if (!pendingOrder) {
+      document.getElementById('summaryItems').innerHTML = '<p style="color:#a0a0b0;font-size:.85rem">No pending order found.</p>';
+      return;
+    }
+    const items = pendingOrder.items || [];
+    document.getElementById('summaryItems').innerHTML = items.map(i =>
+      `<div class="sum-item"><span>${i.name} &times; ${i.qty}</span><span>&#8358;${(i.price * i.qty).toLocaleString()}</span></div>`
+    ).join('');
+    document.getElementById('summaryTotal').textContent = '&#8358;' + Number(pendingOrder.total || 0).toLocaleString();
+    document.getElementById('bankAmount').textContent = '&#8358;' + Number(pendingOrder.total || 0).toLocaleString();
+  }
+
+  // ── Tab switching ─────────────────────────────────────────────────────────
+  function switchPayTab(tab, btn) {
+    document.querySelectorAll('.pay-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.pay-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+  }
+
+  // ── Card formatting ───────────────────────────────────────────────────────
+  function formatCardNumber(input) {
+    let val = input.value.replace(/\D/g, '').substring(0, 16);
+    input.value = val.replace(/(.{4})/g, '$1 ').trim();
+    const display = val.padEnd(16, '•').replace(/(.{4})/g, '$1 ').trim();
+    document.getElementById('previewNumber').textContent = display;
+  }
+
+  function formatExpiry(input) {
+    let val = input.value.replace(/\D/g, '').substring(0, 4);
+    if (val.length >= 2) val = val.substring(0, 2) + '/' + val.substring(2);
+    input.value = val;
+    document.getElementById('previewExpiry').textContent = val || 'MM/YY';
+  }
+
+  function updateCvvPreview(input) {
+    document.getElementById('previewCvv').textContent = input.value ? '•'.repeat(input.value.length) : '•••';
+  }
+
+  function updateNamePreview(input) {
+    document.getElementById('previewName').textContent = input.value.toUpperCase() || 'YOUR NAME';
+  }
+
+  function flipCard(flip) {
+    document.getElementById('cardPreview').classList.toggle('flipped', flip);
+  }
+
+  // ── Copy to clipboard ─────────────────────────────────────────────────────
+  function copyText(text, btn) {
+    navigator.clipboard.writeText(text).then(() => {
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+      setTimeout(() => { btn.innerHTML = orig; }, 1500);
+    });
+  }
+
+  // ── Process payment ───────────────────────────────────────────────────────
+  async function processPayment(method) {
+    if (!pendingOrder) { alert('No order data found. Please go back and place your order.'); return; }
+
+    // Basic validation
+    if (method === 'upi') {
+      const upi = document.getElementById('upiId').value.trim();
+      if (!upi || !upi.includes('@')) { alert('Please enter a valid UPI ID (e.g. name@upi)'); return; }
+    }
+    if (method === 'card') {
+      const num = document.getElementById('cardNumber').value.replace(/\s/g,'');
+      const exp = document.getElementById('cardExpiry').value;
+      const cvv = document.getElementById('cardCvv').value;
+      const name = document.getElementById('cardName').value.trim();
+      if (num.length < 16 || !exp || cvv.length < 3 || !name) { alert('Please fill in all card details.'); return; }
+    }
+
+    // Disable all pay buttons
+    document.querySelectorAll('.pay-btn').forEach(b => { b.disabled = true; });
+
+    // Place order via backend
+    const token = localStorage.getItem('ayoToken');
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+
+    let orderId = pendingOrder.orderId || ('AYO-' + Date.now());
+
+    try {
+      const res = await fetch(ORDER_API, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          customer_name:    pendingOrder.name,
+          customer_phone:   pendingOrder.phone || '',
+          customer_address: pendingOrder.address || '',
+          items:            pendingOrder.items,
+          total_amount:     pendingOrder.total,
+          payment_method:   method
+        })
+      });
+      const json = await res.json();
+      if (json.order_id) orderId = 'AYO-' + json.order_id;
+    } catch {}
+
+    // Clear pending order
+    localStorage.removeItem('pendingOrder');
+    localStorage.removeItem('ayoCart');
+
+    // Show success
+    showSuccess(orderId);
+  }
+
+  function showSuccess(orderId) {
+    document.querySelectorAll('.pay-tabs, .pay-panel').forEach(el => el.style.display = 'none');
+    document.querySelector('.pay-card h2').style.display = 'none';
+    document.getElementById('successOrderId').textContent = 'Order ' + orderId;
+    document.getElementById('successScreen').classList.add('active');
+    // Update cart count
+    document.querySelectorAll('#cartCount').forEach(el => el.textContent = '0');
+  }
+
+  // ── Navbar scroll ─────────────────────────────────────────────────────────
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar')?.classList.toggle('scrolled', window.scrollY > 20);
+  });
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', loadSummary);
+</script>
+</body>
+</html>
