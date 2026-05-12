@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e85d04;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f48c06;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="plateGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f0e8d8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="32" cy="32" r="32" fill="url(#bgGrad)" />
+
+  <!-- Plate -->
+  <ellipse cx="32" cy="38" rx="18" ry="5" fill="rgba(0,0,0,0.15)" />
+  <circle cx="32" cy="35" r="16" fill="url(#plateGrad)" />
+  <circle cx="32" cy="35" r="13" fill="#fff8f0" />
+
+  <!-- Fork (left) -->
+  <rect x="13" y="18" width="2.2" height="14" rx="1.1" fill="#ffffff" />
+  <rect x="12" y="18" width="1.2" height="7" rx="0.6" fill="#ffffff" />
+  <rect x="14.8" y="18" width="1.2" height="7" rx="0.6" fill="#ffffff" />
+
+  <!-- Knife (right) -->
+  <rect x="49" y="18" width="2.2" height="14" rx="1.1" fill="#ffffff" />
+  <path d="M49 18 Q52 22 51.2 26 L49 26 Z" fill="#ffffff" />
+
+  <!-- Steam lines -->
+  <path d="M26 14 Q27.5 11 26 8" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+  <path d="M32 13 Q33.5 10 32 7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+  <path d="M38 14 Q39.5 11 38 8" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+
+  <!-- Food on plate (rice mound) -->
+  <ellipse cx="32" cy="33" rx="8" ry="4.5" fill="#f5c842" />
+  <ellipse cx="32" cy="31.5" rx="6" ry="3" fill="#f7d060" />
+  <!-- Small dots for rice texture -->
+  <circle cx="29" cy="32" r="0.8" fill="#e8b830" />
+  <circle cx="32" cy="31" r="0.8" fill="#e8b830" />
+  <circle cx="35" cy="32" r="0.8" fill="#e8b830" />
+  <circle cx="30.5" cy="33.5" r="0.7" fill="#e8b830" />
+  <circle cx="33.5" cy="33.5" r="0.7" fill="#e8b830" />
+</svg>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AyoFoods — Order Delicious Food & Drinks</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link rel="apple-touch-icon" href="icon.svg"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="logo">
+      <span class="logo-icon">🍽️</span>
+      <span>Ayo<span class="accent">Foods</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#menu">Menu</a></li>
+      <li><a href="#how-it-works">How It Works</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="cart.html" class="cart-btn" id="cartBtn">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-count" id="cartCount">0</span>
+      </a>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-content">
+    <div class="hero-badge"><i class="fas fa-fire"></i> Hot & Fresh Daily</div>
+    <h1>Delicious Food<br/><span class="accent">Delivered Fast</span></h1>
+    <p>Order your favourite Nigerian dishes, drinks & desserts. Fresh, hot, and at your doorstep in minutes.</p>
+    <div class="hero-actions">
+      <a href="#menu" class="btn btn-primary"><i class="fas fa-utensils"></i> Order Now</a>
+      <a href="#how-it-works" class="btn btn-outline">How It Works</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><strong>500+</strong><span>Happy Customers</span></div>
+      <div class="stat"><strong>50+</strong><span>Menu Items</span></div>
+      <div class="stat"><strong>30min</strong><span>Avg Delivery</span></div>
+    </div>
+  </div>
+  <div class="hero-image">
+    <div class="hero-img-wrap">
+      <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600" alt="Delicious food spread" loading="lazy"/>
+      <div class="floating-card card1"><i class="fas fa-star"></i> 4.9 Rating</div>
+      <div class="floating-card card2"><i class="fas fa-truck"></i> Free Delivery</div>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="categories">
+  <div class="container">
+    <div class="cat-grid">
+      <div class="cat-card" onclick="filterMenu('food')">
+        <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=300" alt="Food"/>
+        <div class="cat-overlay"><h3>🍛 Food</h3><p>Nigerian & Continental</p></div>
+      </div>
+      <div class="cat-card" onclick="filterMenu('drink')">
+        <img src="https://images.unsplash.com/photo-1544145945-f90425340c7e?w=300" alt="Drinks"/>
+        <div class="cat-overlay"><h3>🥤 Drinks</h3><p>Fresh & Chilled</p></div>
+      </div>
+      <div class="cat-card" onclick="filterMenu('dessert')">
+        <img src="https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300" alt="Desserts"/>
+        <div class="cat-overlay"><h3>🍩 Desserts</h3><p>Sweet Treats</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MENU SECTION -->
+<section class="menu-section" id="menu">
+  <div class="container">
+    <div class="section-header">
+      <h2>Our <span class="accent">Menu</span></h2>
+      <p>Fresh ingredients, bold flavours, every single day</p>
+    </div>
+    <div class="filter-tabs">
+      <button class="tab active" data-cat="all" onclick="filterMenu('all')">All</button>
+      <button class="tab" data-cat="food" onclick="filterMenu('food')">🍛 Food</button>
+      <button class="tab" data-cat="drink" onclick="filterMenu('drink')">🥤 Drinks</button>
+      <button class="tab" data-cat="dessert" onclick="filterMenu('dessert')">🍩 Desserts</button>
+    </div>
+    <div class="menu-grid" id="menuGrid">
+      <!-- Populated by JS -->
+      <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading menu...</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-it-works" id="how-it-works">
+  <div class="container">
+    <div class="section-header">
+      <h2>How It <span class="accent">Works</span></h2>
+      <p>Order in 3 simple steps</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-icon">🛒</div>
+        <h3>1. Browse & Add</h3>
+        <p>Pick your favourite items from our menu and add them to your cart</p>
+      </div>
+      <div class="step-arrow"><i class="fas fa-arrow-right"></i></div>
+      <div class="step">
+        <div class="step-icon">📝</div>
+        <h3>2. Checkout</h3>
+        <p>Enter your delivery details and choose your payment method</p>
+      </div>
+      <div class="step-arrow"><i class="fas fa-arrow-right"></i></div>
+      <div class="step">
+        <div class="step-icon">🚀</div>
+        <h3>3. Enjoy!</h3>
+        <p>We prepare and deliver your order fresh to your doorstep</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+  <div class="container">
+    <div class="section-header">
+      <h2>What Customers <span class="accent">Say</span></h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card">
+        <div class="stars">⭐⭐⭐⭐⭐</div>
+        <p>"The jollof rice is absolutely amazing! Delivered hot and on time. AyoFoods is my go-to!"</p>
+        <div class="testi-author"><strong>Amaka O.</strong> — Lagos</div>
+      </div>
+      <div class="testi-card">
+        <div class="stars">⭐⭐⭐⭐⭐</div>
+        <p>"Best suya I've had in a long time. The Chapman drink paired perfectly. Will order again!"</p>
+        <div class="testi-author"><strong>Tunde B.</strong> — Abuja</div>
+      </div>
+      <div class="testi-card">
+        <div class="stars">⭐⭐⭐⭐⭐</div>
+        <p>"Super fast delivery and the food was still hot. Pounded yam and egusi was on point!"</p>
+        <div class="testi-author"><strong>Chioma E.</strong> — Port Harcourt</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="container">
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h2>Get In <span class="accent">Touch</span></h2>
+        <p>Have questions? We're here to help.</p>
+        <div class="contact-item"><i class="fas fa-phone"></i> +234 800 000 0000</div>
+        <div class="contact-item"><i class="fas fa-envelope"></i> hello@ayofoods.com</div>
+        <div class="contact-item"><i class="fas fa-map-marker-alt"></i> Lagos, Nigeria</div>
+        <div class="social-links">
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+        </div>
+      </div>
+      <form class="contact-form" onsubmit="sendMessage(event)">
+        <input type="text" placeholder="Your Name" required/>
+        <input type="email" placeholder="Your Email" required/>
+        <textarea placeholder="Your Message" rows="4" required></textarea>
+        <button type="submit" class="btn btn-primary">Send Message <i class="fas fa-paper-plane"></i></button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="logo" style="margin-bottom:1rem">🍽️ Ayo<span class="accent">Foods</span></div>
+        <p>Fresh food & drinks delivered to your door. Quality you can taste.</p>
+      </div>
+      <div>
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="#menu">Menu</a></li>
+          <li><a href="cart.html">Cart</a></li>
+          <li><a href="#how-it-works">How It Works</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Categories</h4>
+        <ul>
+          <li><a href="#" onclick="filterMenu('food')">Food</a></li>
+          <li><a href="#" onclick="filterMenu('drink')">Drinks</a></li>
+          <li><a href="#" onclick="filterMenu('dessert')">Desserts</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Opening Hours</h4>
+        <p>Mon – Fri: 8am – 10pm</p>
+        <p>Sat – Sun: 9am – 11pm</p>
+        <p style="margin-top:.5rem;color:var(--accent)">We deliver every day!</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 AyoFoods. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
